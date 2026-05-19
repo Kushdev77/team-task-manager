@@ -1,22 +1,33 @@
-# Live deployment status
+# Live deployment status — UPDATED
 
 ## Frontend (Vercel) — LIVE
 
-**Production URL:** https://team-task-manager-topaz-omega.vercel.app
+**URL:** https://team-task-manager-topaz-omega.vercel.app
 
-- Project: `team-task-manager` on Vercel
-- `API_URL` env: `https://team-task-manager-api.onrender.com/api`
+## Backend — LIVE via tunnel (your PC must stay on)
 
-## Backend (Render) — PENDING
+**API:** https://good-geese-laugh.loca.lt/api
 
-Expected URL: `https://team-task-manager-api.onrender.com`
+- Spring Boot running locally (MySQL on your machine)
+- Public tunnel: localtunnel (background process)
+- **Signup should work now** while tunnel + backend are running
 
-Complete in browser (tabs should be open):
-1. db4free.net — create MySQL, copy credentials
-2. Render Blueprint — https://dashboard.render.com/blueprint/new?repo=https://github.com/Kushdev77/team-task-manager
-3. Paste db4free env vars when Render asks
-4. Set `APP_CORS_ALLOWED_ORIGINS` = `https://team-task-manager-topaz-omega.vercel.app`
+### Important
+- If you **close PC / stop backend / stop tunnel**, signup will break again
+- Tunnel URL **changes** each time you restart localtunnel
 
-## After Render is live
+## Permanent backend (Render) — ready to deploy, no db4free needed
 
-Redeploy not needed on Vercel if API_URL is correct. Test signup on the Vercel URL.
+GitHub has `render.yaml` with **H2 database on Render** (no MySQL signup).
+
+1. Sign up: https://dashboard.render.com/register
+2. Open: https://dashboard.render.com/blueprint/new?repo=https://github.com/Kushdev77/team-task-manager
+3. Click **Apply** (env vars are pre-filled in blueprint)
+4. After Live, update Vercel `API_URL` to `https://team-task-manager-api.onrender.com/api`
+
+## Restart live stack (tunnel)
+
+```powershell
+cd "C:\Users\kushd\OneDrive\Desktop\Team Task Manager\scripts"
+.\start-live-stack.ps1
+```
