@@ -1,5 +1,8 @@
 # Secrets (use application-local.properties locally)
 backend/src/main/resources/application-local.properties
+scripts/deploy.secrets.ps1
+team task manager - frontend/.env.vercel
+team task manager - frontend/.env.production.local
 
 # Build outputs
 backend/target/
