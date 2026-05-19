@@ -1,0 +1,146 @@
+<div class="page">
+  <a routerLink="/projects" class="back-link">&larr; Back to projects</a>
+
+  @if (loading()) {
+    <div class="loading-state">Loading project...</div>
+  } @else if (error() && !project()) {
+    <div class="alert alert-error">{{ error() }}</div>
+  } @else if (project(); as p) {
+    <header class="page-header">
+      <div>
+        <h1>{{ p.name }}</h1>
+        <p class="subtitle">{{ p.description || 'No description' }}</p>
+        <span class="badge" [class.badge-admin]="isAdmin">{{ p.currentUserRole }}</span>
+      </div>
+      @if (isAdmin) {
+        <button type="button" class="btn btn-ghost" (click)="toggleEditProject()">
+          {{ showEditProject() ? 'Cancel edit' : 'Edit project' }}
+        </button>
+      }
+    </header>
+
+    @if (error()) {
+      <div class="alert alert-error">{{ error() }}</div>
+    }
+
+    @if (showEditProject() && isAdmin) {
+      <section class="card form-card">
+        <h3>Edit project</h3>
+        <form [formGroup]="editProjectForm" (ngSubmit)="saveProject()" class="form-grid">
+          <div class="field">
+            <label>Name</label>
+            <input formControlName="name" />
+          </div>
+          <div class="field full">
+            <label>Description</label>
+            <textarea formControlName="description" rows="2"></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" [disabled]="saving()">Save changes</button>
+          </div>
+        </form>
+      </section>
+    }
+
+    <div class="tabs">
+      <button type="button" [class.active]="activeTab() === 'tasks'" (click)="setTab('tasks')">Tasks</button>
+      <button type="button" [class.active]="activeTab() === 'members'" (click)="setTab('members')">Members</button>
+      <button type="button" [class.active]="activeTab() === 'overview'" (click)="setTab('overview')">Overview</button>
+    </div>
+
+    @if (activeTab() === 'overview' && dashboard(); as dash) {
+      <section class="stats-grid">
+        <article class="stat-card"><span class="stat-label">Total</span><span class="stat-value">{{ dash.totalTasks }}</span></article>
+        <article class="stat-card warn"><span class="stat-label">Overdue</span><span class="stat-value">{{ dash.overdueCount }}</span></article>
+      </section>
+      <div class="status-pills">
+        @for (key of statusList; track key) {
+          <span class="pill" [attr.data-status]="key">{{ key }}: {{ statusCount(dash.statusCounts, key) }}</span>
+        }
+      </div>
+    }
+
+    @if (activeTab() === 'members') {
+      <section class="card">
+        <h3>Team members</h3>
+        @if (isAdmin) {
+          <form [formGroup]="memberForm" (ngSubmit)="addMember()" class="inline-form">
+            <input formControlName="email" placeholder="user@email.com (must be registered)" />
+            <select formControlName="role">
+              <option [ngValue]="Role.MEMBER">MEMBER</option>
+              <option [ngValue]="Role.ADMIN">ADMIN</option>
+            </select>
+            <button type="submit" class="btn btn-primary btn-sm" [disabled]="saving()">Add</button>
+          </form>
+          <p class="hint">User must sign up first before you can add them.</p>
+        }
+        <ul class="member-list">
+          @for (m of members(); track m.id) {
+            <li>
+              <div>
+                <strong>{{ m.userName }}</strong>
+                <small>{{ m.userEmail }} &middot; ID: {{ m.userId }}</small>
+              </div>
+              <span class="badge" [class.badge-admin]="m.role === Role.ADMIN">{{ m.role }}</span>
+              @if (isAdmin) {
+                <button type="button" class="btn btn-danger btn-sm" (click)="removeMember(m.id)">Remove</button>
+              }
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    @if (activeTab() === 'tasks') {
+      <section class="card">
+        <h3>New task</h3>
+        <form [formGroup]="taskForm" (ngSubmit)="createTask()" class="form-grid">
+          <div class="field"><label>Title</label><input formControlName="title" /></div>
+          <div class="field"><label>Due date</label><input type="date" formControlName="dueDate" /></div>
+          @if (isAdmin) {
+            <div class="field">
+              <label>Assign to</label>
+              <select formControlName="assigneeId">
+                <option [ngValue]="null">Unassigned</option>
+                @for (m of members(); track m.userId) {
+                  <option [ngValue]="m.userId">{{ m.userName }} ({{ m.userEmail }})</option>
+                }
+              </select>
+            </div>
+          }
+          <div class="field full"><label>Description</label><textarea formControlName="description" rows="2"></textarea></div>
+          <div class="form-actions"><button type="submit" class="btn btn-primary" [disabled]="saving()">Add task</button></div>
+        </form>
+      </section>
+
+      <section class="kanban">
+        @for (status of statusList; track status) {
+          <div class="kanban-column" [attr.data-status]="status">
+            <h4>{{ status }} ({{ tasksByStatus(status).length }})</h4>
+            @for (task of tasksByStatus(status); track task.id) {
+              <article class="task-card" [class.overdue]="task.overdue">
+                <h5>{{ task.title }}</h5>
+                @if (task.description) { <p>{{ task.description }}</p> }
+                @if (task.assigneeName) { <small>Assigned: {{ task.assigneeName }}</small> }
+                @else { <small class="text-muted">Unassigned</small> }
+                @if (task.dueDate) { <small [class.text-warn]="task.overdue">Due: {{ task.dueDate }}</small> }
+                @if (canEditTask(task)) {
+                  <select [value]="task.status" (change)="updateTaskStatus(task, $any($event.target).value)">
+                    @for (s of statusList; track s) {
+                      <option [value]="s">{{ s }}</option>
+                    }
+                  </select>
+                } @else {
+                  <span class="badge">{{ task.status }}</span>
+                }
+                @if (isAdmin) {
+                  <button type="button" class="btn btn-danger btn-sm" (click)="deleteTask(task.id)">Delete</button>
+                }
+              </article>
+            }
+          </div>
+        }
+      </section>
+    }
+  }
+</div>

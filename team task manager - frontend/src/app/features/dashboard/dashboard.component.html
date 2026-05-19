@@ -1,0 +1,69 @@
+<div class="page">
+  <header class="page-header">
+    <div>
+      <h1>Dashboard</h1>
+      <p class="subtitle">Overview of your projects and tasks</p>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div class="loading-state">Loading dashboard...</div>
+  } @else if (error()) {
+    <div class="alert alert-error">{{ error() }}</div>
+  } @else if (data(); as d) {
+    <section class="stats-grid">
+      <article class="stat-card">
+        <span class="stat-label">Projects</span>
+        <span class="stat-value">{{ d.totalProjects }}</span>
+      </article>
+      <article class="stat-card accent">
+        <span class="stat-label">Total tasks</span>
+        <span class="stat-value">{{ d.totalTasks }}</span>
+      </article>
+      <article class="stat-card warn">
+        <span class="stat-label">Overdue</span>
+        <span class="stat-value">{{ d.totalOverdue }}</span>
+      </article>
+    </section>
+
+    @if (d.projectDashboards.length === 0) {
+      <div class="empty-state card">
+        <h3>No projects yet</h3>
+        <p>Create a project to start tracking tasks.</p>
+        <a routerLink="/projects" class="btn btn-primary">Go to Projects</a>
+      </div>
+    } @else {
+      <section class="project-dashboard-list">
+        @for (proj of d.projectDashboards; track proj.projectId) {
+          <article class="card project-dash-card">
+            <div class="card-header-row">
+              <h3>
+                <a [routerLink]="['/projects', proj.projectId]">{{ proj.projectName }}</a>
+              </h3>
+              @if (proj.overdueCount > 0) {
+                <span class="badge badge-warn">{{ proj.overdueCount }} overdue</span>
+              }
+            </div>
+            <div class="status-pills">
+              @for (key of statusList; track key) {
+                <span class="pill" [attr.data-status]="key">
+                  {{ key }}: {{ statusCount(proj.statusCounts, key) }}
+                </span>
+              }
+            </div>
+            @if (proj.overdueTasks.length > 0) {
+              <ul class="overdue-list">
+                @for (task of proj.overdueTasks; track task.id) {
+                  <li>
+                    <span>{{ task.title }}</span>
+                    <small>Due {{ task.dueDate }}</small>
+                  </li>
+                }
+              </ul>
+            }
+          </article>
+        }
+      </section>
+    }
+  }
+</div>

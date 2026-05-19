@@ -1,0 +1,40 @@
+<div class="page">
+  <header class="page-header">
+    <div>
+      <h1>My Tasks</h1>
+      <p class="subtitle">Tasks assigned to you</p>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div class="loading-state">Loading...</div>
+  } @else if (error()) {
+    <div class="alert alert-error">{{ error() }}</div>
+  } @else if (tasks().length === 0) {
+    <div class="empty-state card">
+      <h3>No assigned tasks</h3>
+      <p>Tasks assigned to you will appear here.</p>
+    </div>
+  } @else {
+    <div class="task-list">
+      @for (task of tasks(); track task.id) {
+        <article class="card task-row" [class.overdue]="task.overdue">
+          <div>
+            <h3>{{ task.title }}</h3>
+            <p>{{ task.description }}</p>
+            <small>Project #{{ task.projectId }} &middot; Due: {{ task.dueDate || '—' }}</small>
+            @if (task.overdue) { <span class="badge badge-warn">Overdue</span> }
+          </div>
+          <div class="task-actions">
+            <select [value]="task.status" (change)="updateStatus(task, $any($event.target).value)">
+              <option [value]="TaskStatus.TODO">TODO</option>
+              <option [value]="TaskStatus.IN_PROGRESS">IN_PROGRESS</option>
+              <option [value]="TaskStatus.DONE">DONE</option>
+            </select>
+            <a [routerLink]="['/projects', task.projectId]" class="btn btn-ghost btn-sm">View project</a>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</div>

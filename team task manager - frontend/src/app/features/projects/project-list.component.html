@@ -1,0 +1,67 @@
+<div class="page">
+  <header class="page-header">
+    <div>
+      <h1>Projects</h1>
+      <p class="subtitle">Manage your team workspaces</p>
+    </div>
+    <button type="button" class="btn btn-primary" (click)="toggleForm()">
+      {{ showForm() ? 'Cancel' : '+ New Project' }}
+    </button>
+  </header>
+
+  @if (error()) {
+    <div class="alert alert-error">{{ error() }}</div>
+  }
+
+  @if (showForm()) {
+    <section class="card form-card">
+      <h3>Create project</h3>
+      <form [formGroup]="form" (ngSubmit)="create()" class="form-grid">
+        <div class="field">
+          <label>Name</label>
+          <input formControlName="name" placeholder="Project name" />
+        </div>
+        <div class="field full">
+          <label>Description</label>
+          <textarea formControlName="description" rows="2" placeholder="Optional description"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="saving()">
+            {{ saving() ? 'Creating...' : 'Create' }}
+          </button>
+        </div>
+      </form>
+    </section>
+  }
+
+  @if (loading()) {
+    <div class="loading-state">Loading projects...</div>
+  } @else if (projects().length === 0) {
+    <div class="empty-state card">
+      <h3>No projects yet</h3>
+      <p>Create your first project to get started.</p>
+    </div>
+  } @else {
+    <div class="project-grid">
+      @for (p of projects(); track p.id) {
+        <a [routerLink]="['/projects', p.id]" class="card project-card">
+          <div class="project-card-top">
+            <h3>{{ p.name }}</h3>
+            <span class="badge" [class.badge-admin]="p.currentUserRole === Role.ADMIN">
+              {{ p.currentUserRole }}
+            </span>
+          </div>
+          <p class="project-desc">{{ p.description || 'No description' }}</p>
+          <footer class="project-meta">
+            <small>By {{ p.createdByName }}</small>
+            @if (p.currentUserRole === Role.ADMIN) {
+              <button type="button" class="btn btn-danger btn-sm" (click)="deleteProject(p.id, $event)">
+                Delete
+              </button>
+            }
+          </footer>
+        </a>
+      }
+    </div>
+  }
+</div>

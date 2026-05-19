@@ -1,0 +1,29 @@
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-icon">&#9670;</span>
+      <span>TeamTask</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <span class="nav-icon">&#9632;</span> Dashboard
+      </a>
+      <a routerLink="/projects" routerLinkActive="active">
+        <span class="nav-icon">&#9776;</span> Projects
+      </a>
+      <a routerLink="/my-tasks" routerLinkActive="active">
+        <span class="nav-icon">&#10003;</span> My Tasks
+      </a>
+    </nav>
+    <div class="sidebar-user">
+      <div class="user-info">
+        <strong>{{ auth.user()?.name }}</strong>
+        <small>{{ auth.user()?.email }}</small>
+      </div>
+      <button type="button" class="btn btn-ghost btn-sm" (click)="logout()">Logout</button>
+    </div>
+  </aside>
+  <main class="main-content">
+    <router-outlet />
+  </main>
+</div>
