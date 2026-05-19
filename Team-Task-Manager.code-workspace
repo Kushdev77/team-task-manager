@@ -1,0 +1,12 @@
+{
+  "folders": [
+    {
+      "name": "backend",
+      "path": "backend"
+    }
+  ],
+  "settings": {
+    "java.import.maven.enabled": true,
+    "java.configuration.updateBuildConfiguration": "automatic"
+  }
+}

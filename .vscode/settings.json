@@ -1,0 +1,8 @@
+{
+  "java.import.maven.enabled": true,
+  "java.import.maven.recursive": true,
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.eclipse.downloadSources": true,
+  "java.maven.updateSnapshots": true,
+  "maven.executable.preferMavenWrapper": true
+}
