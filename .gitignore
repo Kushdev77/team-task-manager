@@ -1,0 +1,15 @@
+# Secrets (use application-local.properties locally)
+backend/src/main/resources/application-local.properties
+
+# Build outputs
+backend/target/
+team task manager - frontend/node_modules/
+team task manager - frontend/dist/
+team task manager - frontend/.angular/
+
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
