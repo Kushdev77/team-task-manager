@@ -16,3 +16,9 @@ team task manager - frontend/.angular/
 *.iml
 .DS_Store
 Thumbs.db
+
+# Vercel & Env configs
+.env.production
+.env.vercel.production
+.vercel/
+
